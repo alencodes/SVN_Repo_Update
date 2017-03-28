@@ -3,7 +3,15 @@ import subprocess
 import time
 import logging
 from re import sub
+from optparse import OptionParser
 
+parser = OptionParser()
+parser.add_option("-p", "--path", dest="root_path",
+                  help="set root path to start search", metavar="PATH")
+
+(options, args) = parser.parse_args()
+
+root_path = options.root_path if options.root_path else '.'
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s',
@@ -26,7 +34,7 @@ def main():
 def is_svn_installed():
     cmd = 'svn --version'
     try:
-        subprocess.Popen(cmd, startupinfo=startupinfo)
+        p = subprocess.Popen(cmd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return True
     except Exception as e:
         return False
@@ -39,7 +47,7 @@ def update_all_repo():
 
     print('Collecting SVN repositories')
     
-    for root, dirs, files in os.walk(".", topdown=False):
+    for root, dirs, files in os.walk(root_path, topdown=False):
         for name in dirs:
             if name == '.svn':
                 count += 1
@@ -48,7 +56,7 @@ def update_all_repo():
                 cmd = 'svn up "' + svnDir + '"'
                 try:
                     p = subprocess.Popen(cmd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                    pout, _ =  p.communicate()
+                    pout, _ = p.communicate()
                     pout = sub('[\n\r]', '', pout.decode('utf-8'))
                     pout = sub('[:]', ' is ', pout)
                     logging.info('{}'.format(pout))
