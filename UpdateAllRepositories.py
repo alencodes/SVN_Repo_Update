@@ -34,7 +34,8 @@ def main():
 def is_svn_installed():
     cmd = 'svn --version'
     try:
-        p = subprocess.Popen(cmd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        subprocess.Popen(cmd, startupinfo=startupinfo,
+                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         return True
     except Exception as e:
         return False
@@ -51,11 +52,11 @@ def update_all_repo():
         for name in dirs:
             if name == '.svn':
                 count += 1
-                svnDir = os.path.join(root, name)[2:-5]
-                print('Updating ' + svnDir)
-                cmd = 'svn up "' + svnDir + '"'
+                svn_dir = os.path.join(root, name)[2:-5]
+                print('Updating ' + svn_dir)
+                cmd = 'svn up "' + svn_dir + '"'
                 try:
-                    p = subprocess.Popen(cmd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    p = subprocess.Popen(cmd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     pout, _ = p.communicate()
                     pout = sub('[\n\r]', '', pout.decode('utf-8'))
                     pout = sub('[:]', ' is ', pout)
